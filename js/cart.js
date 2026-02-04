@@ -180,18 +180,11 @@ function displayCartItems() {
         let name = '';
         let address = '';
         
-        if (currentRestaurant.includes('olas')) {
-            name = 'Olas Nutrition';
-            address = 'Opposite Alhikmah University, Ilorin';
-        } else if (currentRestaurant.includes('k-bakes')) {
-            name = 'K Bakes';
-            address = 'Near Alhikmah University, Ilorin';
-        } else if (currentRestaurant.includes('beiroot')) {
-            name = 'Beiroot Restaurant';
-            address = 'Near Alhikmah University';
-        } else if (currentRestaurant.includes('sherrif')) {
-            name = 'Sherrif Mai Shayi';
-            address = 'Near Alhikmah University, Ilorin';
+        // Get restaurant name and address
+        const restaurant = getRestaurantById(currentRestaurant);
+        if (restaurant) {
+            name = restaurant.name;
+            address = restaurant.location;
         }
         
         restaurantName.textContent = name;
@@ -255,29 +248,47 @@ function displayCartItems() {
     if (checkoutBtn) checkoutBtn.disabled = false;
 }
 
+// Get restaurant by ID
+function getRestaurantById(restaurantId) {
+    // This function will be overridden by main.js restaurant data
+    if (typeof restaurants !== 'undefined') {
+        return restaurants.find(r => r.id === restaurantId);
+    }
+    return null;
+}
+
 // Get restaurant name from ID
 function getRestaurantName(restaurantId) {
-    if (restaurantId.includes('olas')) return 'Olas Nutrition';
-    if (restaurantId.includes('k-bakes')) return 'K Bakes';
-    if (restaurantId.includes('beiroot')) return 'Beiroot Restaurant';
-    if (restaurantId.includes('sherrif')) return 'Sherrif Mai Shayi';
+    const restaurant = getRestaurantById(restaurantId);
+    if (restaurant) return restaurant.name;
     return 'Restaurant';
 }
 
 // Get emoji for item based on name
 function getItemEmoji(name) {
-    if (name.toLowerCase().includes('jollof') || name.toLowerCase().includes('rice')) return '🍚';
-    if (name.toLowerCase().includes('chicken')) return '🍗';
-    if (name.toLowerCase().includes('shawarma') || name.toLowerCase().includes('wrap')) return '🌯';
-    if (name.toLowerCase().includes('bread')) return '🍞';
-    if (name.toLowerCase().includes('pie') || name.toLowerCase().includes('doughnut') || name.toLowerCase().includes('roll')) return '🥧';
-    if (name.toLowerCase().includes('ice cream') || name.toLowerCase().includes('cream')) return '🍦';
-    if (name.toLowerCase().includes('drink') || name.toLowerCase().includes('zobo') || name.toLowerCase().includes('fura') || name.toLowerCase().includes('yogurt')) return '🥤';
-    if (name.toLowerCase().includes('sandwich')) return '🥪';
-    if (name.toLowerCase().includes('fries') || name.toLowerCase().includes('potato')) return '🍟';
-    if (name.toLowerCase().includes('indomie')) return '🍜';
-    if (name.toLowerCase().includes('egg')) return '🥚';
-    if (name.toLowerCase().includes('tea')) return '☕';
+    name = name.toLowerCase();
+    if (name.includes('jollof') || name.includes('rice')) return '🍚';
+    if (name.includes('chicken')) return '🍗';
+    if (name.includes('shawarma') || name.includes('wrap')) return '🌯';
+    if (name.includes('bread')) return '🍞';
+    if (name.includes('pie') || name.includes('doughnut') || name.includes('roll') || name.includes('pastry')) return '🥧';
+    if (name.includes('ice cream') || name.includes('cream')) return '🍦';
+    if (name.includes('drink') || name.includes('zobo') || name.includes('fura') || name.includes('yogurt') || name.includes('juice')) return '🥤';
+    if (name.includes('sandwich')) return '🥪';
+    if (name.includes('fries') || name.includes('potato')) return '🍟';
+    if (name.includes('indomie') || name.includes('noodle')) return '🍜';
+    if (name.includes('egg')) return '🥚';
+    if (name.includes('tea')) return '☕';
+    if (name.includes('burger')) return '🍔';
+    if (name.includes('pasta')) return '🍝';
+    if (name.includes('soup')) return '🥣';
+    if (name.includes('beef')) return '🥩';
+    if (name.includes('fish')) return '🐟';
+    if (name.includes('plantain')) return '🍌';
+    if (name.includes('orange') || name.includes('pineapple') || name.includes('banana') || name.includes('fruit')) return '🍎';
+    if (name.includes('cheese') || name.includes('wara')) return '🧀';
+    if (name.includes('smoothie') || name.includes('milkshake')) return '🥛';
+    if (name.includes('water')) return '💧';
     return '🍽️';
 }
 

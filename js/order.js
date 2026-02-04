@@ -39,16 +39,43 @@ function processOrder(event) {
     
     // Get restaurant name
     let restaurantName = '';
-    if (restaurant.includes('olas')) restaurantName = 'Olas Nutrition';
-    else if (restaurant.includes('k-bakes')) restaurantName = 'K Bakes';
-    else if (restaurant.includes('beiroot')) restaurantName = 'BEIROOT.NG';
-    else if (restaurant.includes('sherrif')) restaurantName = 'Sherrif Mai Shayi';
-    else if (restaurant.includes('parfait')) restaurantName = 'ParfaitStop';
-    else if (restaurant.includes('item7')) restaurantName = 'Item7 Restaurant';
-    else if (restaurant.includes('sesede')) restaurantName = 'Sesede Food Restaurant';
-    else if (restaurant.includes('mac-dee')) restaurantName = 'MAC-DEE';
-    else if (restaurant.includes('alhaja')) restaurantName = 'Alhaja Habibat Restaurant';
-    else restaurantName = 'Restaurant';
+    const restaurantId = restaurant;
+    
+    // Get restaurant from global restaurants array if available
+    if (typeof restaurants !== 'undefined') {
+        const restaurantData = restaurants.find(r => r.id === restaurantId);
+        if (restaurantData) {
+            restaurantName = restaurantData.name;
+        }
+    }
+    
+    // Fallback to hardcoded names
+    if (!restaurantName) {
+        if (restaurant.includes('olas')) restaurantName = 'Olas Nutrition';
+        else if (restaurant.includes('k-bakes')) restaurantName = 'K Bakes';
+        else if (restaurant.includes('beiroot')) restaurantName = 'BEIROOT.NG';
+        else if (restaurant.includes('sherrif')) restaurantName = 'Sherrif Mai Shayi';
+        else if (restaurant.includes('parfait')) restaurantName = 'ParfaitStop';
+        else if (restaurant.includes('item7')) restaurantName = 'Item7 Restaurant';
+        else if (restaurant.includes('sesede')) restaurantName = 'Sesede Food Restaurant';
+        else if (restaurant.includes('mac-dee')) restaurantName = 'MAC-DEE';
+        else if (restaurant.includes('alhaja')) restaurantName = 'Alhaja Habibat Restaurant';
+        else if (restaurant.includes('abu-adamu')) restaurantName = 'Abu Adamu Fruits';
+        else if (restaurant.includes('cake-delight')) restaurantName = 'Cake Delight';
+        else if (restaurant.includes('crunch-express')) restaurantName = 'Crunch Express';
+        else if (restaurant.includes('farmers-kitchen')) restaurantName = 'The Farmer\'s Kitchen';
+        else if (restaurant.includes('safianu')) restaurantName = 'Safianu Brahim Mai Shayi';
+        else if (restaurant.includes('mummy-saoban')) restaurantName = 'Mummy Saoban Restaurant';
+        else if (restaurant.includes('fatimah')) restaurantName = 'Fatimah A\' Wara & Gurasa';
+        else if (restaurant.includes('red-caffino')) restaurantName = 'Red Caffino Restaurant';
+        else restaurantName = 'Restaurant';
+    }
+    
+    // Check for minimum purchase requirement (Fatimah A' Wara & Gurasa)
+    if (restaurant.includes('fatimah') && total < 500) {
+        showNotification(`Minimum purchase of ₦500 required for ${restaurantName}. Add more items to your cart.`);
+        return;
+    }
     
     // Format items list for WhatsApp
     const itemsList = cart.map(item => 
@@ -181,4 +208,75 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Initialize WhatsApp float if function exists
+    if (typeof initWhatsAppFloat === 'function') {
+        initWhatsAppFloat();
+    }
 });
+
+// Show notification function (fallback)
+function showNotification(message) {
+    if (window.showNotification) {
+        window.showNotification(message);
+        return;
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        z-index: 3000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+            if (style.parentNode) {
+                style.parentNode.removeChild(style);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Export for use in other files
+window.processOrder = processOrder;
+window.showNotification = showNotification;
